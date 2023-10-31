@@ -1,0 +1,29 @@
+logs/
+# .NET Core
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+*.user
+
+# Visual Studio
+.vs/
+.vscode/
+*.vs/
+*.suo
+*.cache
+*.sln.docstates
+
+# Resharper
+_ReSharper*/
+*.resharper
+*.DotSettings.user
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+build/
+[Bb]in/
+[Oo]bj/
