@@ -1,34 +1,39 @@
+using MagicVilla;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
 Log.Logger = new LoggerConfiguration().WriteTo.Logger(lc => lc
-		.Filter.ByIncludingOnly(e => e.Level == Serilog.Events.LogEventLevel.Warning)
-		.WriteTo.File("logs/warn/log.txt", rollingInterval: RollingInterval.Day))
+		.Filter.ByIncludingOnly(e => e.Level == Serilog.Events.LogEventLevel.Error)
+		.WriteTo.File("logs/error/log.txt", rollingInterval: RollingInterval.Day))
 	.WriteTo.File("logs/app/log.txt", rollingInterval: RollingInterval.Day)
 	.WriteTo.Console()
 	.CreateLogger();
 
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+{
+	options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
+
 builder.Host.UseSerilog();
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddControllers(option =>
-{
-	// option.ReturnHttpNotAcceptable = true;
-}).AddNewtonsoftJson().AddXmlDataContractSerializerFormatters();
+builder.Services.AddControllers();
+
+builder.Services.AddTransient<IVillaService, VillaService>();
+builder.Services.AddTransient<GlobalExceptionHandlingMiddleware>();
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
 	app.UseSwagger();
 	app.UseSwaggerUI();
 }
 
-// app.UseHttpsRedirection();
+app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
 
+app.UseHttpsRedirection();
 app.MapControllers();
-
 app.Run();
