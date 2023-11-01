@@ -43,7 +43,7 @@ public class VillaService : IVillaService
 		_applicationDbContext.Villas.Add(villa);
 		_applicationDbContext.SaveChanges();
 
-		return _applicationDbContext.Villas.FirstOrDefault(v => v.Name == villa.Name)!;
+		return villa;
 
 	}
 
